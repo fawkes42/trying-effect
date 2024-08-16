@@ -24,33 +24,28 @@ class Pokemon extends Schema.Class<Pokemon>('Pokemon')({
     height: Schema.Number,
     weight: Schema.Number,
 }) {}
-const decodePokemon = Schema.decodeUnknown(Pokemon)
 
-const config = Config.string('BASE_URL')
+const getPokemon = Effect.gen(function* () {
+    const baseUrl = yield* Config.string('BASE_URL')
 
-const fetchRequest = (baseUrl: string) =>
-    Effect.tryPromise({
+    const response = yield* Effect.tryPromise({
         try: () => fetch(`${baseUrl}/api/v2/pokemon/garchomp/`),
         catch: () => new FetchError(),
     })
 
-const jsonResponse = (response: Response) =>
-    Effect.tryPromise({
+    if (!response.ok) {
+        return yield* new FetchError()
+    }
+
+    const json = yield* Effect.tryPromise({
         try: () => response.json(),
         catch: () => new JsonError(),
     })
 
-const program = Effect.gen(function* () {
-    const baseUrl = yield* config
-    const response = yield* fetchRequest(baseUrl)
-    if (!response.ok) {
-        return yield* new FetchError()
-    }
-    const _response = yield* jsonResponse(response)
-    return yield* decodePokemon(_response)
+    return yield* Schema.decodeUnknown(Pokemon)(json)
 })
 
-const main = program.pipe(
+const main = getPokemon.pipe(
     Effect.catchTags({
         FetchError: () => Effect.succeed('Fetch error'),
         JsonError: () => Effect.succeed('Json error'),
