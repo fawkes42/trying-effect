@@ -1,19 +1,7 @@
 import { Schema } from '@effect/schema'
 import { Config, Effect } from 'effect'
-import express from 'express'
-import { env } from '../src/env'
 import { FetchError, JsonError } from './errors'
 import { Pokemon } from './schemas'
-
-const app = express()
-
-app.use(express.json())
-
-const PORT = env.NODE_ENV === 'production' ? 3000 : 4200
-
-app.listen(PORT, async () => {
-    console.log(`✔✔✔✔✔✔ Working at PORT: ${PORT} ✔✔✔✔✔✔`)
-})
 
 const getPokemon = Effect.gen(function* () {
     const baseUrl = yield* Config.string('BASE_URL')
