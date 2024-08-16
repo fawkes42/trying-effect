@@ -4,14 +4,14 @@ import type { ConfigError } from 'effect/ConfigError'
 import { FetchError, JsonError } from './errors'
 import { Pokemon } from './schemas'
 
-export interface PokeApi {
+interface PokeApiImpl {
     readonly getPokemon: Effect.Effect<
-        typeof Pokemon.Type,
+        Pokemon,
         FetchError | JsonError | ParseResult.ParseError | ConfigError
     >
 }
 
-export const PokeApi = Context.GenericTag<PokeApi>('PokeApi')
+export class PokeApi extends Context.Tag('PokeApi')<PokeApi, PokeApiImpl>() {}
 
 export const PokeApiLive = PokeApi.of({
     getPokemon: Effect.gen(function* () {
