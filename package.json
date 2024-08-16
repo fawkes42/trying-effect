@@ -2,7 +2,8 @@
     "name": "elemento-42-handler",
     "type": "module",
     "scripts": {
-        "dev": "bun --watch src/index.ts"
+        "dev": "bun --watch src/index.ts",
+        "test": "vitest"
     },
     "devDependencies": {
         "@biomejs/biome": "^1.8.3",
