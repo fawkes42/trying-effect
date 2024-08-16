@@ -34,8 +34,10 @@ const jsonResponse = (response: Response) =>
 
 const main = fetchRequest.pipe(
     Effect.flatMap(jsonResponse),
-    Effect.catchTag('FetchError', () => Effect.succeed('Fetch error')),
-    Effect.catchTag('JsonError', () => Effect.succeed('Json error')),
+    Effect.catchTags({
+        FetchError: () => Effect.succeed('Fetch error'),
+        JsonError: () => Effect.succeed('Json error'),
+    }),
 )
 
 Effect.runPromise(main).then((result) => {
