@@ -35,12 +35,23 @@ export class PokeApi extends Context.Tag('PokeApi')<PokeApi, PokeApiImpl>() {
     })
 
     static readonly Test = PokeApi.of({
-        getPokemon: Effect.succeed({
-            id: 1,
-            height: 10,
-            weight: 10,
-            order: 1,
-            name: 'myname',
+        getPokemon: Effect.gen(function* () {
+            const response = yield* Effect.tryPromise({
+                try: () =>
+                    fetch(`http://localhost:3000/api/v2/pokemon/garchomp/`),
+                catch: () => new FetchError(),
+            })
+
+            if (!response.ok) {
+                return yield* new FetchError()
+            }
+
+            const json = yield* Effect.tryPromise({
+                try: () => response.json(),
+                catch: () => new JsonError(),
+            })
+
+            return yield* Schema.decodeUnknown(Pokemon)(json)
         }),
     })
 }
