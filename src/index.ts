@@ -42,8 +42,8 @@ const program = Effect.gen(function* () {
     if (!response.ok) {
         return yield* new FetchError()
     }
-
-    return yield* jsonResponse(response)
+    const _response = yield* jsonResponse(response)
+    return yield* decodePokemon(_response)
 })
 
 const main = program.pipe(
