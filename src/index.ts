@@ -1,5 +1,10 @@
+import { Console, Effect } from "effect";
 import express from 'express'
-import { env } from './src/env'
+import { env } from '../src/env'
+
+const main = Console.info("Hello world");
+
+Effect.runSync(main);
 
 const app = express()
 
