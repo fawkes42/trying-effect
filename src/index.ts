@@ -12,14 +12,32 @@ app.listen(PORT, async () => {
     console.log(`✔✔✔✔✔✔ Working at PORT: ${PORT} ✔✔✔✔✔✔`)
 })
 
-/// Effect<Response, UnknownException>
-const fetchRequest = Effect.tryPromise(() =>
-    fetch('https://pokeapi.co/api/v2/pokemon/garchomp/'),
+interface FetchError {
+    readonly _tag: 'FetchError'
+}
+
+interface JsonError {
+    readonly _tag: 'JsonError'
+}
+
+const fetchRequest = Effect.tryPromise({
+    try: () => fetch('https://pokeapi.co/api/v2/psadokemon/garchomp/'),
+    catch: (): FetchError => ({ _tag: 'FetchError' }),
+})
+
+const jsonResponse = (response: Response) =>
+    /// 👇 Effect<unknown, JsonError>
+    Effect.tryPromise({
+        try: () => response.json(),
+        catch: (): JsonError => ({ _tag: 'JsonError' }),
+    })
+
+const main = fetchRequest.pipe(
+    Effect.flatMap(jsonResponse),
+    Effect.catchTag('FetchError', () => Effect.succeed('Fetch error')),
+    Effect.catchTag('JsonError', () => Effect.succeed('Json error')),
 )
 
-/// Effect<unknown, UnknownException>
-const jsonResponse = (response: Response) =>
-    Effect.tryPromise(() => response.json())
-
-/// Effect<unknown, UnknownException>
-const main = Effect.flatMap(fetchRequest, jsonResponse)
+Effect.runPromise(main).then((result) => {
+    console.log(result)
+})
