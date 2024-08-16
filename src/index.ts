@@ -1,7 +1,9 @@
 import { Schema } from '@effect/schema'
-import { Config, Data, Effect } from 'effect'
+import { Config, Effect } from 'effect'
 import express from 'express'
 import { env } from '../src/env'
+import { FetchError, JsonError } from './errors'
+import { Pokemon } from './schemas'
 
 const app = express()
 
@@ -12,18 +14,6 @@ const PORT = env.NODE_ENV === 'production' ? 3000 : 4200
 app.listen(PORT, async () => {
     console.log(`✔✔✔✔✔✔ Working at PORT: ${PORT} ✔✔✔✔✔✔`)
 })
-
-class FetchError extends Data.TaggedError('FetchError') {}
-
-class JsonError extends Data.TaggedError('JsonError') {}
-
-class Pokemon extends Schema.Class<Pokemon>('Pokemon')({
-    id: Schema.Number,
-    order: Schema.Number,
-    name: Schema.String,
-    height: Schema.Number,
-    weight: Schema.Number,
-}) {}
 
 const getPokemon = Effect.gen(function* () {
     const baseUrl = yield* Config.string('BASE_URL')
