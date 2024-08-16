@@ -13,6 +13,7 @@
         "typescript": "^5.0.0"
     },
     "dependencies": {
+        "@effect/schema": "^0.71.0",
         "@t3-oss/env-core": "^0.11.0",
         "effect": "^3.6.4",
         "express": "^4.19.2"
