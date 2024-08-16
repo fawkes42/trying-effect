@@ -17,13 +17,13 @@ class FetchError extends Data.TaggedError('FetchError') {}
 
 class JsonError extends Data.TaggedError('JsonError') {}
 
-const Pokemon = Schema.Struct({
+class Pokemon extends Schema.Class<Pokemon>('Pokemon')({
     id: Schema.Number,
     order: Schema.Number,
     name: Schema.String,
     height: Schema.Number,
     weight: Schema.Number,
-})
+}) {}
 const decodePokemon = Schema.decodeUnknown(Pokemon)
 
 const fetchRequest = Effect.tryPromise({
