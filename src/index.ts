@@ -50,6 +50,7 @@ const main = program.pipe(
     Effect.catchTags({
         FetchError: () => Effect.succeed('Fetch error'),
         JsonError: () => Effect.succeed('Json error'),
+        ParseError: () => Effect.succeed('Parse error'),
     }),
 )
 
