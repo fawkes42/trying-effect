@@ -1,3 +1,4 @@
+import { Schema } from '@effect/schema'
 import { Data, Effect } from 'effect'
 import express from 'express'
 import { env } from '../src/env'
@@ -15,6 +16,15 @@ app.listen(PORT, async () => {
 class FetchError extends Data.TaggedError('FetchError') {}
 
 class JsonError extends Data.TaggedError('JsonError') {}
+
+const Pokemon = Schema.Struct({
+    id: Schema.Number,
+    order: Schema.Number,
+    name: Schema.String,
+    height: Schema.Number,
+    weight: Schema.Number,
+})
+const decodePokemon = Schema.decodeUnknown(Pokemon)
 
 const fetchRequest = Effect.tryPromise({
     try: () => fetch('https://pokeapi.co/api/v2/pokemon/garchomp/'),
