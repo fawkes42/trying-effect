@@ -1,4 +1,4 @@
-import { Console, Effect } from 'effect'
+import { Data, Effect } from 'effect'
 import express from 'express'
 import { env } from '../src/env'
 
@@ -12,32 +12,25 @@ app.listen(PORT, async () => {
     console.log(`✔✔✔✔✔✔ Working at PORT: ${PORT} ✔✔✔✔✔✔`)
 })
 
-interface FetchError {
-    readonly _tag: 'FetchError'
-}
+class FetchError extends Data.TaggedError('FetchError') {}
 
-interface JsonError {
-    readonly _tag: 'JsonError'
-}
+class JsonError extends Data.TaggedError('JsonError') {}
 
 const fetchRequest = Effect.tryPromise({
     try: () => fetch('https://pokeapi.co/api/v2/pokemon/garchomp/'),
-    catch: (): FetchError => ({ _tag: 'FetchError' }),
+    catch: () => new FetchError(),
 })
 
 const jsonResponse = (response: Response) =>
-    /// 👇 Effect<unknown, JsonError>
     Effect.tryPromise({
         try: () => response.json(),
-        catch: (): JsonError => ({ _tag: 'JsonError' }),
+        catch: () => new JsonError(),
     })
 
 const main = fetchRequest.pipe(
     Effect.filterOrFail(
         (response) => response.ok,
-        (): FetchError => ({
-            _tag: 'FetchError',
-        }),
+        () => new FetchError(),
     ),
     Effect.flatMap(jsonResponse),
     Effect.catchTags({
