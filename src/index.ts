@@ -1,5 +1,5 @@
 import { Schema } from '@effect/schema'
-import { Data, Effect } from 'effect'
+import { Config, Data, Effect } from 'effect'
 import express from 'express'
 import { env } from '../src/env'
 
@@ -26,10 +26,13 @@ class Pokemon extends Schema.Class<Pokemon>('Pokemon')({
 }) {}
 const decodePokemon = Schema.decodeUnknown(Pokemon)
 
-const fetchRequest = Effect.tryPromise({
-    try: () => fetch('https://pokeapi.co/api/v2/pokemon/garchomp/'),
-    catch: () => new FetchError(),
-})
+const config = Config.string('BASE_URL')
+
+const fetchRequest = (baseUrl: string) =>
+    Effect.tryPromise({
+        try: () => fetch(`${baseUrl}/api/v2/pokemon/garchomp/`),
+        catch: () => new FetchError(),
+    })
 
 const jsonResponse = (response: Response) =>
     Effect.tryPromise({
@@ -38,7 +41,8 @@ const jsonResponse = (response: Response) =>
     })
 
 const program = Effect.gen(function* () {
-    const response = yield* fetchRequest
+    const baseUrl = yield* config
+    const response = yield* fetchRequest(baseUrl)
     if (!response.ok) {
         return yield* new FetchError()
     }
