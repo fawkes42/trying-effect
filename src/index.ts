@@ -1,7 +1,7 @@
 import { Effect } from 'effect'
 import { PokeApi } from './poke-api'
 
-const program = Effect.gen(function* () {
+export const program = Effect.gen(function* () {
     const pokeApi = yield* PokeApi
     return yield* pokeApi.getPokemon
 })
